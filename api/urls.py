@@ -9,8 +9,9 @@ router.register(r'groups', views.GroupViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('generate_users', views.Generate_Random_Users.as_view()),
-    path('search/<key>', views.SearchUser.as_view()),
+    path('generate_users/', views.Generate_Random_Users.as_view()),
+    path('search/<key>/', views.SearchUser.as_view()),
+    path('student_api/', views.StudentList.as_view()),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     
 ]

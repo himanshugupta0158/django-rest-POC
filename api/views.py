@@ -3,22 +3,55 @@ from django.shortcuts import render
 from django.contrib.auth.models import User, Group
 from django.core.paginator import Paginator
 from rest_framework import viewsets, views
+from rest_framework.generics import ListAPIView, GenericAPIView
 from rest_framework import permissions, status
 from rest_framework.response import Response
-from rest_framework.pagination import PageNumberPagination, LimitOffsetPagination
-from rest_framework.filters import BaseFilterBackend, SearchFilter, OrderingFilter
-from .serializers import UserSerializer, GroupSerializer, RandomUserSerializer, SearchSerializer
+
+from .paginations import StandardResultsSetPagination
+
+from .filters import UserFilter
+from .serializers import UserSerializer, GroupSerializer, RandomUserSerializer, StudentSerializer
 import random
 # 3rd party
 from faker import Faker
 from django_filters.rest_framework import DjangoFilterBackend
+from django_filters import FilterSet
+
+# in-build django rest filter
+from rest_framework.filters import BaseFilterBackend, SearchFilter, OrderingFilter
+
 
 from django.db.models import F, Q, Value, OuterRef, Subquery
+from .models import Student
+
+
+class StudentList(ListAPIView):
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
+    pagination_class = StandardResultsSetPagination
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['name', 'roll', 'city']
+    # filter_backends = (
+        # DjangoFilterBackend,
+        # SearchFilter,
+        # OrderingFilter,
+    # )
+
+    # def get_queryset(self):
+          ## for allowing only logged in user related student data to be shown up.
+    #     user = User.objects.get(username=self.request.user)
+    #     print(f"User : {user}")
+    #     return Student.objects.filter(passby=user.id)
+
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    pagination_class = StandardResultsSetPagination
+    filter_backends = [OrderingFilter]
+    search_fields = ['username', 'email'] # not working properly
 
 
 class GroupViewSet(viewsets.ModelViewSet):
@@ -54,58 +87,52 @@ class Generate_Random_Users(views.APIView):
             user.save(update_fields=['password'])
             
         return Response({"Message" : "100 Users Created Successfully."})
-    
-class LargeResultsSetPagination(PageNumberPagination):
-    page_size = 100
-    page_size_query_param = 'page_size'
-    max_page_size = 1000
-
-class StandardResultsSetPagination(PageNumberPagination):
-    page_size = 10
-    page_size_query_param = 'page_size'
-    max_page_size = 10
-
-    def get_paginated_response(self, data):
-        return Response({
-            'links': {
-                'next': self.get_next_link(),
-                'previous': self.get_previous_link()
-            },
-            'count': self.page.paginator.count,
-            'results': data
-        })
 
 
 class SearchUser(views.APIView):
     queryset = User.objects.all().order_by('-date_joined')
-    # serializer_class = SearchSerializer
     serializer_class = RandomUserSerializer
     permission_classes = [permissions.IsAuthenticated]
     pagination_class = StandardResultsSetPagination
-    # filter_class = filter_custom_class
-    filter_backends = (
-        DjangoFilterBackend,
-        SearchFilter,
-        OrderingFilter,
-    )
+    # filter_backends = [DjangoFilterBackend]  # not working
 
-    
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    filterset_class = UserFilter
+    search_fields = ['username', 'email']
+
+
+    def get_queryset(self, queryset=None):
+        # Apply filters to the queryset based on the request
+        if queryset is None:
+            queryset = User.objects.all().order_by('-date_joined')
+        queryset = self.filterset_class(self.request.GET, queryset=queryset).qs
+        return queryset
+
     def get(self, request, key):
+
+        # ---------------------------------
+        #  ----- Putting random data of student -----
+        # fake = Faker()
+        # for _ in range(50):
+        #     Student.objects.create(
+        #         name = fake.name(),
+        #         roll = random.randint(10000,99999),
+        #         city = fake.city(),
+        #         passby = random.randint(502,701)
+        #     )
+        # ---------------------------------
 
         # Filter users based on the search key
         data = User.objects.filter(Q(username__contains=key))
-        
-        # Paginate the data
+
+        queryset = self.get_queryset(data)
+
+        # Paginate the filtered data
         paginator = self.pagination_class()
-        page = paginator.paginate_queryset(data, request)
+        page = paginator.paginate_queryset(queryset, request)
 
         # Serialize the paginated data
         serializer = RandomUserSerializer(page, many=True)
 
         # Return the paginated response
         return paginator.get_paginated_response(serializer.data)
-
-
-
-
-
