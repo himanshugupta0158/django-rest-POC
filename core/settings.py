@@ -162,3 +162,7 @@ CRISPY_USE_LEGACY_CLASSES = True
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
 CRISPY_TEMPLATE_PACK = "bootstrap4"
+
+
+# Logout Redirect page
+LOGOUT_REDIRECT_URL = 'login'

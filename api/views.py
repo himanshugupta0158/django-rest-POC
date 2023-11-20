@@ -38,6 +38,7 @@ class StudentList(ListAPIView,CreateAPIView, RetrieveUpdateAPIView, DestroyAPIVi
     pagination_class = StandardResultsSetPagination
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["name", "roll", "city"]
+    
     # filter_backends = (
     # DjangoFilterBackend,
     # SearchFilter,
@@ -72,13 +73,50 @@ class StudentList(ListAPIView,CreateAPIView, RetrieveUpdateAPIView, DestroyAPIVi
 # Creating Student CRUD API using mixins and Generic API Views
 class StudentView(
     GenericAPIView,
-    mixins.ListModelMixin
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+):
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
+    # pagination_class = StandardResultsSetPagination # pagination
+    # Adding filters and  All Filters are working
+    filter_backends = [SearchFilter, DjangoFilterBackend, OrderingFilter]
+    
+    # Filter by name, roll and city 
+    filterset_fields = ["name", "roll", "city"] # add which filter field to be added
+
+    # Search Filter requirements
+    search_fields = ["name", "roll"]
+
+
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+    
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+    
+class StudentDetailView(
+    GenericAPIView,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.DestroyModelMixin
 ):
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
 
     def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
+        return self.retrieve(request, *args, **kwargs)
+    
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+    
+    def patch(self, request, *args, **kwargs):
+        return self.partial_update(request, *args, **kwargs)
+    
+    def delete(self, request, *args, **kwargs):
+        return self.delete(request, *args, **kwargs)
+    
+    
     
 
 
@@ -131,9 +169,26 @@ class Generate_Random_Users(views.APIView):
 
 
 class SearchUser(views.APIView):
+    queryset = User.objects.all().order_by("username")
+    serializer_class = RandomUserSerializer
+    # permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, key):
+
+        # Filter users based on the search key
+        data = User.objects.filter(Q(username__contains=key))
+
+        # Serialize data
+        serializer = RandomUserSerializer(data, many=True)
+
+        # Return the paginated response
+        return Response(serializer.data)
+
+
+class SearchUserWithPaginationAndFilters(views.APIView):
     queryset = User.objects.all().order_by("-date_joined")
     serializer_class = RandomUserSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = [permissions.IsAuthenticated]
     pagination_class = StandardResultsSetPagination
     # filter_backends = [DjangoFilterBackend]  # not working
 

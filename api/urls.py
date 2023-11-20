@@ -18,6 +18,7 @@ urlpatterns = [
 
     # Generic API View + DRF Mixins - Default , CRUD
     path('student-view/', views.StudentView.as_view()),
+    path('student-view/<pk>/', views.StudentDetailView.as_view()), # pk is used as default if anything is not given by user
 
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     

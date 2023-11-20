@@ -12,12 +12,100 @@
 {% endblock %}
 
 {% block content %}
-    <!-- Main content for the home page goes here -->
-    <h2>Latest Posts</h2>
-    <p>This is where your posts will be displayed.</p>
-    <!-- Add other content as needed -->
+
+<style>
+    .card {
+        border: 1px solid black;
+        border-radius: 10%;
+        margin-bottom: 15px;
+    }
+</style>
+
+<!-- Main content for the home page goes here -->
+<h2>Latest Posts</h2>
+<p>This is where your posts will be displayed.</p>
+<!-- Add other content as needed -->
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <form id="searchForm">
+                <div class="form-group">
+                    <label for="search_term">Search User:</label>
+                    <input type="text" class="form-control" id="search_term" placeholder="Type username..." required>
+                </div>
+                <button type="button" class="btn btn-primary" onclick="searchUser()">Search</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-4">
+    <div class="alert alert-info font-weight-bold" role="alert">Search Result : </div>
+    <div class="row" id="searchResultContainer"></div>
+</div>
+
 {% endblock %}
 
+{% block javascript %}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script>
+    function searchUser() {
+        var search_term = $('#search_term').val();
+
+        search_term = search_term.replace(' ', '+');
+        console.log(search_term);
+
+        if (search_term === '') {
+            var resultContainer = $('#searchResultContainer');
+            resultContainer.empty();
+            resultContainer.append('<div class="col alert alert-danger" role="alert">Please make sure that the search field is not empty.</div>');
+        } else {
+            $.ajax({
+                type: 'GET',
+                url: '/api/search/' + search_term + '/',
+                dataType: 'json',
+                success: function (data) {
+                    console.log(data);
+                    displaySearchResults(data);
+                },
+                error: function (error) {
+                    console.log('Error:', error);
+                }
+            });
+        }
+    }
+
+    function displaySearchResults(results) {
+        var resultContainer = $('#searchResultContainer');
+        resultContainer.empty();
+
+        if (results.length > 0) {
+            results.forEach(function (result) {
+                resultContainer.append(
+                    '<div class="col-md-6 col-lg-4 col-xl-3">' +  <!-- Adjust the column classes for responsiveness -->
+                    '<div class="card">' +
+                    '<h5 class="card-header">' + result.username + '</h5>' +
+                    '<div class="card-body">' +
+                    '<p class="card-text"><b>First Name: </b>' + result.first_name + '</p>' +
+                    '<p class="card-text"><b>Last Name: </b>' + result.last_name + '</p>' +
+                    '<p class="card-text"><b>Email: </b>' + result.email + '</p>' +
+                    '<p class="card-text"><b>Is Active: </b>' + result.is_active + '</p>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>'
+                );
+            });
+        } else {
+            resultContainer.append('<p class="alert alert-info">No results found.</p>');
+        }
+    }
+</script>
+
+{% endblock javascript %}
+
 {% block sidebar %}
-   
+
 {% endblock %}
