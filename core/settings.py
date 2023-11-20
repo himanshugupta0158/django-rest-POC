@@ -38,10 +38,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'django_filters',
     'crispy_forms',
+    'crispy_bootstrap4',
+    'django_filters',
     'api',
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -64,7 +66,7 @@ TEMPLATES = [
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
+                'django.contrib.auth.context_processors.auth',                
                 'django.contrib.messages.context_processors.messages',
             ],
         },
@@ -119,7 +121,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+# Static files (CSS, JavaScript, images)
+STATIC_URL = '/static/'
+
+# The directory where 'collectstatic' will collect static files.
+STATIC_ROOT = 'staticfiles'
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -140,3 +147,18 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #         'django_filters.rest_framework.DjangoFilterBackend'
 #     ]
 # }
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'  # Use 'bootstrap4' for Bootstrap 4, or 'bootstrap3' for Bootstrap 3
+
+
+CRISPY_CLASS_CONVERTERS = {
+    'textinput': 'form-control',
+    'fileinput': 'form-control-file',
+    'clearablefileinput': 'form-control-file',
+}
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = ('bootstrap', 'uni-form', 'bootstrap3', 'bootstrap4')
+CRISPY_USE_LEGACY_CLASSES = True
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
+CRISPY_TEMPLATE_PACK = "bootstrap4"

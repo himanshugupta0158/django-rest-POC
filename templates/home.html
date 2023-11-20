@@ -1,15 +1,23 @@
+<!-- home.html -->
+
 {% extends 'base.html' %}
 
+{% load crispy_forms_tags %}
 
-{% block title %}Home{% endblock title %}
+{% block title %}Home | {{ block.super }}{% endblock %}
 
+{% block user_actions %}
+    <!-- Login and Signup forms using Crispy Forms go here -->
+    Home Page
+{% endblock %}
 
 {% block content %}
+    <!-- Main content for the home page goes here -->
+    <h2>Latest Posts</h2>
+    <p>This is where your posts will be displayed.</p>
+    <!-- Add other content as needed -->
+{% endblock %}
 
-Hello World!
-
-This is Home page
-    
-{% endblock content %}
-    
-    
+{% block sidebar %}
+   
+{% endblock %}
