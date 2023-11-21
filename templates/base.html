@@ -73,7 +73,8 @@
         </button>
       </div>
       <div class="modal-body">
-        <form>
+        <form action="{% url 'user-update' %}" method="post">
+          {% csrf_token %}
           <div class="form-group">
             <label for="username">Username :</label>
             <input type="text" class="form-control" name="username" id="username" value="{{request.user.username}}">
@@ -91,14 +92,20 @@
 
           <div class="form-group">
             <label for="email">Email :</label>
-            <input type="text" class="form-control" name="username" id="username" id="email" value="{{request.user.email}}">
+            <input type="email" class="form-control" name="email" id="email" id="email" value="{{request.user.email}}">
           </div>
 
+          <div class="form-group">
+            <label for="password">Password :</label>
+            <input type="password" class="form-control" name="password" id="password" id="password" placeholder="Enter your password">
+          </div>
+          
+
+          <button type="submit" class="btn btn-primary">Save changes</button>
         </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
       </div>
     </div>
   </div>

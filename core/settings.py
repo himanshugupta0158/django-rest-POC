@@ -37,11 +37,19 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # Django support libraries like for APIs and designing templates
     'rest_framework',
     'crispy_forms',
     'crispy_bootstrap4',
+    
+    # 3rd party
     'django_filters',
+    "debug_toolbar",
+
+    # Django Apps
     'api',
+    'institute',
 ]
 
 
@@ -53,6 +61,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -166,3 +175,22 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 # Logout Redirect page
 LOGOUT_REDIRECT_URL = 'login'
+
+
+# password Reset settings and for sending mail on gmail
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# EMAIL_USE_TLS = True
+# EMAIL_HOST = 'your_email_host'  # For example, 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_HOST_USER = 'your_email@example.com'
+# EMAIL_HOST_PASSWORD = 'your_email_password'
+
+# Django debug toolbar
+
+###### Important to show ############
+INTERNAL_IPS = [
+    '127.0.0.1',
+    'localhost',
+]
+

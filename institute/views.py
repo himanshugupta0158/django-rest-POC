@@ -50,3 +50,30 @@ class SignUpView(View):
             return redirect('home')  # Redirect to your home page
 
         return render(request, 'signup.html', {'form': form})
+    
+
+class LoggedInUserUpdate(View):
+    def post(self, request):
+        data = request.POST
+        print("Logged In User Update data : ",data)
+        username = data['username']
+        first_name = data['first_name']
+        last_name = data['last_name']
+        email = data['email']
+        new_password = data['password']
+        user = User.objects.get(id=request.user.id)
+        user.username = username
+        user.first_name = first_name
+        user.last_name = last_name
+        user.email = email
+        user.save()
+        if new_password is None :
+            # if request.user.check_password(new_password):
+            print("Old Password")
+        else:
+            user.set_password(new_password)
+
+        return redirect('home')
+
+
+

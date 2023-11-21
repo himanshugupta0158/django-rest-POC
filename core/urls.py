@@ -16,10 +16,19 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-
+from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/',include("api.urls")),
     path('',include("institute.urls")),
 ]
+
+# this is done because we want this toolbar to showup only on development server not on deployment server.
+# Important for toolbar to showUp
+if settings.DEBUG:
+    import debug_toolbar
+
+    urlpatterns += [
+        path("__debug__/", include("debug_toolbar.urls")),
+    ]
