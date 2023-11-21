@@ -48,7 +48,7 @@
     {% comment %} {{request.user}} {% endcomment %}
     
     {% if request.user.is_authenticated %}
-        <a class="btn btn-info my-2 my-sm-1 mr-sm-2 text-white" href="{% url 'home' %}">{{ request.user.username }}</a>
+        <button class="btn btn-info my-2 my-sm-1 mr-sm-2 text-white" type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">{{ request.user.username }}</button>
         <a class="btn btn-danger my-2 my-sm-0 text-white" href="{% url 'logout' %}">Logout</a>
 
     {% else %}
@@ -60,6 +60,49 @@
   
   </div>
 </nav>
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel"> User '{{request.user.username}}' Details</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label for="username">Username :</label>
+            <input type="text" class="form-control" name="username" id="username" value="{{request.user.username}}">
+          </div>
+
+          <div class="form-group">
+            <label for="first_name">First Name :</label>
+            <input type="text" class="form-control" name="first_name" id="first_name" value="{{request.user.first_name}}">
+          </div>
+
+          <div class="form-group">
+            <label for="last_name">Last Name :</label>
+            <input type="text" class="form-control" name="last_name" id="last_name" value="{{request.user.last_name}}">
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email :</label>
+            <input type="text" class="form-control" name="username" id="username" id="email" value="{{request.user.email}}">
+          </div>
+
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
 
     <div class="container-fluid">
         <!-- Main content area (left side) goes here -->
