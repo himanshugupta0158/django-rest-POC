@@ -45,8 +45,19 @@ class SignUpView(View):
     def post(self, request):
         form = BootstrapSignupForm(request.POST)
         if form.is_valid():
-            user = form.save()
+            # Get user data from the form
+            username = form.cleaned_data['username']
+            first_name = form.cleaned_data['first_name']
+            last_name = form.cleaned_data['last_name']
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password1']
+
+            # Create and save the user with additional fields
+            user = User.objects.create_user(username=username, first_name=first_name, last_name=last_name, email=email, password=password)
+            
+            # Log the user in
             login(request, user)
+            
             return redirect('home')  # Redirect to your home page
 
         return render(request, 'signup.html', {'form': form})

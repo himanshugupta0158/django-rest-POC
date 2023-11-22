@@ -30,4 +30,4 @@ class SearchSerializer(serializers.ModelSerializer):
 class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
-        fields = ['id', 'name', 'roll', 'city', 'passby']
+        fields = ['id', 'name', 'roll', 'city', 'passed_by', 'marks']
