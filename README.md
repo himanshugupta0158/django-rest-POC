@@ -69,7 +69,7 @@ class Book(models.Model):
     publication_year = models.IntegerField()
 ```
 
-#### Here are five scenarios using OuterRef:
+`Here are five scenarios using OuterRef:`
 * Find Authors with Books Published in the Same Year as Their Highest Rated Book:
 ```
 from django.db.models import OuterRef, Subquery, Max
