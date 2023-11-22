@@ -49,7 +49,71 @@ if queryset.exists():
     # Do something
 ```
 
-6. OuterRef and Subquery:
+6. OuterRef :
+* `OuterRef` in Django is used to reference a value from an outer query in a subquery. 
+* It allows you to perform correlated subqueries where the inner query depends on the values of the outer query. 
+* This can be useful when you want to filter or annotate a queryset based on values from another related queryset.
+
+` Let's say you have two models, "Author" and "Book", where Book has a foreign key to Author:`
+
+```
+# models.py
+from django.db import models
+
+class Author(models.Model):
+    name = models.CharField(max_length=100)
+
+class Book(models.Model):
+    title = models.CharField(max_length=100)
+    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+    publication_year = models.IntegerField()
+```
+
+#### Here are five scenarios using OuterRef:
+* Find Authors with Books Published in the Same Year as Their Highest Rated Book:
+```
+from django.db.models import OuterRef, Subquery, Max
+
+highest_rated_book = Book.objects.filter(author=OuterRef('pk')).order_by('-rating').values('publication_year')[:1]
+authors_with_highest_rated_books = Author.objects.annotate(
+    highest_rated_year=Subquery(highest_rated_book)
+).filter(book__publication_year=OuterRef('highest_rated_year'))
+```
+* Find Authors with Books Published in the Same Year as a Specific Book:
+```
+specific_book_id = 1
+specific_book_year = Book.objects.filter(id=specific_book_id).values('publication_year')[:1]
+authors_with_same_year_books = Author.objects.filter(book__publication_year=Subquery(specific_book_year))
+```
+
+* Find Authors with Books Published in the Same Year as Their Latest Book:
+
+```
+latest_book_year = Book.objects.filter(author=OuterRef('pk')).order_by('-publication_year').values('publication_year')[:1]
+authors_with_latest_books = Author.objects.annotate(
+    latest_book_year=Subquery(latest_book_year)
+).filter(book__publication_year=OuterRef('latest_book_year'))
+```
+* Find Authors with Books Published in the Same Year as the Average Publication Year of Their Books:
+```
+average_publication_year = Book.objects.filter(author=OuterRef('pk')).aggregate(avg_year=Avg('publication_year'))
+authors_with_avg_year_books = Author.objects.filter(book__publication_year=average_publication_year['avg_year'])
+```
+* Find Authors with Books Published in the Same Year as Their Books with the Lowest Ratings:
+```
+lowest_rated_books = Book.objects.filter(author=OuterRef('pk')).order_by('rating').values('publication_year')[:1]
+authors_with_lowest_rated_books = Author.objects.annotate(
+    lowest_rated_year=Subquery(lowest_rated_books)
+).filter(book__publication_year=OuterRef('lowest_rated_year'))
+```
+7. Exists, SubQuery and OuterRef:
+* Using `Exists` with `OuterRef` for correlated subqueries.
+```
+from django.db.models import Exists
+
+subquery = OtherModel.objects.filter(parent_id=OuterRef('id'))
+queryset = MyModel.objects.annotate(has_children=Exists(subquery))
+```
 * `OuterRef` and `Subquery` are used for nested queries.
 ```
 from django.db.models import OuterRef, Subquery
@@ -58,14 +122,7 @@ subquery = Subquery(OtherModel.objects.filter(id=OuterRef('id')).values('field')
 queryset = MyModel.objects.annotate(other_model_field=subquery)
 ```
 
-7. Exists and OuterRef:
-* Using `Exists` with `OuterRef` for correlated subqueries.
-```
-from django.db.models import Exists
 
-subquery = OtherModel.objects.filter(parent_id=OuterRef('id'))
-queryset = MyModel.objects.annotate(has_children=Exists(subquery))
-```
 
 8. `Avg`, `Sum`, `Min`, `Max`:
 * Aggregation functions for average, sum, min, and max.
